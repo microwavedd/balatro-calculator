@@ -8,87 +8,107 @@ from collections import Counter
                    eightball,misprint,dusk,raisedfist,chaostheclown,
                    fibonacci,steeljoker,scaryface,abstractjoker,delayedgratification]"""
 # Preliminary joker-related settings + intro
-jokersInPlay, enhancementsInPlay, raritiesInPlay = [], [], []
+# Global variables for jokers, enhancements, and hand-related settings
+jokers_in_play, enhancements_in_play, rarities_in_play = [], [], []
+play_hand = []
 
+# Joker-related settings + intro
 def pre():
-    print(jokersInPlay, enhancementsInPlay, raritiesInPlay)
-    addJoker = input(
-        f"Which joker cards do you currently have active?\n"
-        f"You can either add them separated with commas or one by one.\n"
-        f"If adding them the second way, type 'Done' when you're finished.\n"
-        f"Type joker name/enhancement/rarity. Separate each joker by commas.\n"
-        f"You currently have {len(jokersInPlay)} jokers in play.\n"
-        f"Type 'Tuto' for more information.\n"
-    )
-    if addJoker.lower() == "tuto":
-        print(
-            "Joker enhancements:\n"
-            "Base (standard card): X\nFoil (+50 chips): F\nHolo (+10 mult): H\n"
-            "Polychrome (x1.5 mult): P\nNegative: N\n\n"
-            "Joker rarities:\n"
-            "Common: C\nUncommon: U\nRare: R\nLegendary: L\n"
-        )
-        pre()
+    print("Welcome to the Joker Card Setup!")
+    print("Current Jokers in play:", jokers_in_play)
 
-    elif addJoker.lower() != "done":
-        jokers = addJoker.split(",")
+    while True:
+        add_joker = input(
+            "\nWhich joker cards do you currently have active?\n"
+            "Provide joker/enhancement/rarity separated by commas, or type 'Done' to finish.\n"
+            "Type 'Tuto' for instructions.\n"
+        )
+        if add_joker.lower() == "tuto":
+            print(
+                "\nJoker enhancements:\n"
+                "- Base (standard card): X\n"
+                "- Foil (+50 chips): F\n"
+                "- Holo (+10 mult): H\n"
+                "- Polychrome (x1.5 mult): P\n"
+                "- Negative: N\n\n"
+                "Joker rarities:\n"
+                "- Common: C\n"
+                "- Uncommon: U\n"
+                "- Rare: R\n"
+                "- Legendary: L\n"
+            )
+            continue
+
+        if add_joker.lower() == "done":
+            break
+
+        jokers = add_joker.split(",")
         for joker in jokers:
-            bits = joker.split("/")
+            bits = joker.strip().split("/")
             if len(bits) == 3:
-                jokersInPlay.append(bits[0])
-                enhancementsInPlay.append(bits[1])
-                raritiesInPlay.append(bits[2])
-    
-    confirm = input("Do you wish to add more jokers? (y/n): ")
-    if confirm.lower() == "y":
-        pre()
-    else:
-        enterHand()
+                jokers_in_play.append(bits[0].strip())
+                enhancements_in_play.append(bits[1].strip())
+                rarities_in_play.append(bits[2].strip())
+            else:
+                print(f"Invalid joker format: {joker}. Please try again.")
+
+    print("\nJoker setup complete.")
+    enter_hand()
 
 # Hand-related settings
-cardRank, cardSuit, cardEnhancements, cardSeal = [], [], [], []
+def enter_hand():
+    global play_hand
+    print("\nLet's configure your hand of cards.")
 
-def enterHand():
-    addHand = input(
-        "What cards are you going to play?\n"
-        "Provide 5 cards separated by commas in the format rank/suit/enhancement/seal.\n"
-        "Type 'Tuto' for instructions.\n"
-    )
-    if addHand.lower() == "tuto":
-        print(
-            "Example card format: A/H/F/C (Ace of Hearts, Foil enhancement, Common rarity)\n"
-            "Separate cards by commas.\n"
+    while True:
+        add_hand = input(
+            "\nWhat cards are you going to play?\n"
+            "Provide up to 5 cards in the format rank/suit/enhancement/seal separated by commas.\n"
+            "Type 'Done' when finished or 'Tuto' for instructions.\n"
         )
-        enterHand()
-    elif addHand.lower() != "done":
-        cards = addHand.split(",")
-        for card in cards:
-            bits = card.split("/")
-            if len(bits) == 4:
-                cardRank.append(bits[0])
-                cardSuit.append(bits[1])
-                cardEnhancements.append(bits[2])
-                cardSeal.append(bits[3])
-    
-    confirm = input("Do you wish to add more cards? (y/n): ")
-    if confirm.lower() == "y":
-        enterHand()
-    else:
-        handLevel()
+        if add_hand.lower() == "tuto":
+            print(
+                "\nExample card format: A/H/F/C\n"
+                "(Ace of Hearts, Foil enhancement, Common rarity)\n"
+                "Separate cards by commas.\n"
+            )
+            continue
 
-def whatHand(ranks, suits):
+        if add_hand.lower() == "done":
+            break
+
+        cards = add_hand.split(",")
+        for card in cards:
+            bits = card.strip().split("/")
+            if len(bits) == 4:
+                card_rank.append(bits[0].strip())
+                card_suit.append(bits[1].strip())
+                card_enhancements.append(bits[2].strip())
+                card_seal.append(bits[3].strip())
+            else:
+                print(f"Invalid card format: {card}. Please try again.")
+
+        if len(card_rank) >= 5:
+            print("Maximum of 5 cards allowed. Proceeding with evaluation.")
+            break
+
+    play_hand = determine_hand(card_rank, card_suit)
+    calculate_rewards(play_hand)
+
+# Determine the type of poker hand
+def determine_hand(ranks, suits):
     rank_values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
                    '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
     rank_numbers = sorted(rank_values[rank] for rank in ranks)
     is_flush = len(set(suits)) == 1
-    is_straight = all(rank_numbers[i] - rank_numbers[i - 1] == 1 for i in range(1, 5))
-    
+    is_straight = all(rank_numbers[i] - rank_numbers[i - 1] == 1 for i in range(1, len(rank_numbers)))
+
     if rank_numbers == [2, 3, 4, 5, 14]:
         is_straight = True
-    
+
     rank_counts = Counter(rank_numbers)
     counts = sorted(rank_counts.values(), reverse=True)
-    
+
     if is_straight and is_flush:
         return "Royal Flush" if max(rank_numbers) == 14 else "Straight Flush"
     elif counts == [4, 1]:
@@ -107,31 +127,37 @@ def whatHand(ranks, suits):
         return "One Pair"
     else:
         return "High Card"
-    
-playHand = whatHand(cardRank, cardSuit)
-    
-def levelScaler(hand):
-    hands = ["High card","Pair","Two pair","Three of a kind","Four of a kind","Full house","Flush","Straight","Flush five","Flush house","Five of a kind", " Straight flush", "Royal flush"]
-    chips = [5,10,20,30,60,40,35,30,160,140,120,100,100]
-    mult = [1,2,2,3,7,4,4,4,16,14,12,8,8]
-        
-    index = hands.index(hand)
-    return [chips[index],mult[index]]
-pre()
 
-handChips = levelScaler(playHand)[0]
-handMult = levelScaler(playHand)[1]
+# Calculate rewards based on hand type
+def calculate_rewards(hand):
+    hand_data = {
+        "High Card": {"chips": 5, "mult": 1},
+        "One Pair": {"chips": 10, "mult": 2},
+        "Two Pair": {"chips": 20, "mult": 2},
+        "Three of a Kind": {"chips": 30, "mult": 3},
+        "Straight": {"chips": 40, "mult": 4},
+        "Flush": {"chips": 35, "mult": 4},
+        "Full House": {"chips": 50, "mult": 5},
+        "Four of a Kind": {"chips": 60, "mult": 7},
+        "Straight Flush": {"chips": 100, "mult": 10},
+        "Royal Flush": {"chips": 200, "mult": 20},
+    }
 
+    if hand not in hand_data:
+        print("Invalid hand type. No rewards calculated.")
+        return
 
-def handLevel():
+    chips = hand_data[hand]["chips"]
+    mult = hand_data[hand]["mult"]
 
-    addLevel = str(input(f"You are playing a {playHand}.\nWhat is the current level of the provided hand?\n"))
-    return [handChips * addLevel, handMult * addLevel]
+    level = int(input(f"\nYou are playing a {hand}. Enter the level of your hand (1 or higher): "))
 
-rank_value = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-                   '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 11}
+    total_chips = chips * level
+    total_mult = mult * level
 
+    print(f"\nFinal Results:\nHand: {hand}\nChips: {total_chips}\nMultiplier: {total_mult}\nTotal Reward: {total_chips * total_mult}")
 
-    
-    
-
+# Run the program
+if __name__ == "__main__":
+    card_rank, card_suit, card_enhancements, card_seal = [], [], [], []
+    pre()
