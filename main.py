@@ -1,13 +1,5 @@
 from collections import Counter
 
-"""jokersInGeneral = [joker,greedyjoker,lustyjoker,wrathfuljoker,gluttonousjoker,
-                   jollyjoker,zanyjoker,madjoker,crazyjoker,drolljoker,
-                   slyjoker,wilyjoker,cleverjoker,deviousjoker,craftyjoker,
-                   halfjoker,jokerstencil,fourfingers,mime,creditcard,
-                   ceremonialdagger,banner,mysticsummit,marblejoker,loyaltycard,
-                   eightball,misprint,dusk,raisedfist,chaostheclown,
-                   fibonacci,steeljoker,scaryface,abstractjoker,delayedgratification]"""
-# Preliminary joker-related settings + intro
 # Global variables for jokers, enhancements, and hand-related settings
 jokers_in_play, enhancements_in_play, rarities_in_play = [], [], []
 play_hand = []
@@ -109,7 +101,13 @@ def determine_hand(ranks, suits):
     rank_counts = Counter(rank_numbers)
     counts = sorted(rank_counts.values(), reverse=True)
 
-    if is_straight and is_flush:
+    if counts == [5]:
+        return "Five of a Kind"
+    elif is_flush and counts == [3, 2]:
+        return "Flush House"
+    elif is_flush and counts == [5]:
+        return "Flush Five"
+    elif is_straight and is_flush:
         return "Royal Flush" if max(rank_numbers) == 14 else "Straight Flush"
     elif counts == [4, 1]:
         return "Four of a Kind"
@@ -141,6 +139,9 @@ def calculate_rewards(hand):
         "Four of a Kind": {"chips": 60, "mult": 7},
         "Straight Flush": {"chips": 100, "mult": 10},
         "Royal Flush": {"chips": 200, "mult": 20},
+        "Five of a Kind": {"chips": 120, "mult": 12},
+        "Flush House": {"chips": 140, "mult": 14},
+        "Flush Five": {"chips": 160, "mult": 16},
     }
 
     if hand not in hand_data:
