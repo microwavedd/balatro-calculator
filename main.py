@@ -86,6 +86,7 @@ def enter_hand():
 
     play_hand = determine_hand(card_rank, card_suit)
     calculate_rewards(play_hand)
+    calculate_card_sum()
 
 # Determine the type of poker hand
 def determine_hand(ranks, suits):
@@ -157,6 +158,22 @@ def calculate_rewards(hand):
     total_mult = mult * level
 
     print(f"\nFinal Results:\nHand: {hand}\nChips: {total_chips}\nMultiplier: {total_mult}\nTotal Reward: {total_chips * total_mult}")
+
+# Calculate the sum of the card values
+def calculate_card_sum():
+    rank_values = {
+        '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+        '10': 10, 'J': 10, 'Q': 10, 'K': 10, 'A': 11
+    }
+    total_sum = 0
+
+    for rank, enhancement in zip(card_rank, card_enhancements):
+        card_value = rank_values.get(rank, 0)
+        total_sum += card_value
+
+        # Placeholder for future logic related to enhancements
+
+    print(f"\nTotal value of played cards: {total_sum}")
 
 # Run the program
 if __name__ == "__main__":
