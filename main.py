@@ -1,6 +1,8 @@
 from collections import Counter
 
 # Global variables for jokers, enhancements, and hand-related settings
+jokersAtEnd = ""
+jokersPerCard = ""
 jokers_in_play, enhancements_in_play, rarities_in_play = [], [], []
 play_hand = []
 
@@ -46,6 +48,8 @@ def pre():
 
     print("\nJoker setup complete.")
     enter_hand()
+    
+
 
 # Hand-related settings
 def enter_hand():
@@ -90,6 +94,7 @@ def enter_hand():
 
 # Determine the type of poker hand
 def determine_hand(ranks, suits):
+    global currentHand
     rank_values = {'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
                    '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14}
     rank_numbers = sorted(rank_values[rank] for rank in ranks)
@@ -103,32 +108,46 @@ def determine_hand(ranks, suits):
     counts = sorted(rank_counts.values(), reverse=True)
 
     if counts == [5]:
+        currentHand = "Five of a Kind"
         return "Five of a Kind"
     elif is_flush and counts == [3, 2]:
+        currentHand = "Flush House"
         return "Flush House"
     elif is_flush and counts == [5]:
+        currentHand = "Flush Five"
         return "Flush Five"
     elif is_straight and is_flush:
+        currentHand = "Royal Flush" if max(rank_numbers) == 14 else "Straight Flush"
         return "Royal Flush" if max(rank_numbers) == 14 else "Straight Flush"
     elif counts == [4, 1]:
+        currentHand = "Four of a Kind"
         return "Four of a Kind"
     elif counts == [3, 2]:
+        currentHand = "Full House"
         return "Full House"
     elif is_flush:
+        currentHand = "Flush"
         return "Flush"
     elif is_straight:
+        currentHand = "Straight"
         return "Straight"
     elif counts == [3, 1, 1]:
+        currentHand = "Three of a Kind"
         return "Three of a Kind"
     elif counts == [2, 2, 1]:
+        currentHand = "Two Pair"
         return "Two Pair"
     elif counts == [2, 1, 1, 1]:
+        currentHand = "One Pair"
         return "One Pair"
     else:
+        currentHand = "High Card"
         return "High Card"
 
 # Calculate rewards based on hand type
 def calculate_rewards(hand):
+    global total_chips
+    global total_mult
     hand_data = {
         "High Card": {"chips": 5, "mult": 1},
         "One Pair": {"chips": 10, "mult": 2},
@@ -174,6 +193,81 @@ def calculate_card_sum():
         # Placeholder for future logic related to enhancements
 
     print(f"\nTotal value of played cards: {total_sum}")
+    
+#jokers
+
+def joker():
+    global total_mult
+    total_mult += 4
+def greedyjoker():
+    global total_mult
+    for i in card_suit:
+        if i == "D":
+            total_mult += 3
+def lustyjoker():
+    global total_mult
+    for i in card_suit:
+        if i == "H":
+            total_mult += 3
+def wrathful():
+    global total_mult
+    for i in card_suit:
+        if i == "S":
+            total_mult += 3
+def gluttonousjoker():
+    global total_mult
+    for i in card_suit:
+        if i == "C":
+            total_mult += 3
+def jollyjoker():
+    global total_mult
+    if currentHand == "One Pair":
+        total_mult += 8
+def zanyjoker():
+    global total_mult
+    if currentHand == "Three of a Kind":
+        total_mult += 12
+def madjoker():
+    global total_mult
+    if currentHand == "Two Pair":
+        total_mult += 10
+def crazyjoker():
+    global total_mult
+    if currentHand == "Straight":
+        total_mult += 12
+def drolljoker():
+    global total_mult
+    if currentHand == "Flush":
+        total_mult += 10
+def slyjoker():
+    global total_chips
+    if currentHand == "One Pair":
+        total_chips += 50
+def wilyjoker():
+    global total_chips
+    if currentHand == "Three of a Kind":
+        total_chips += 100
+def cleverjoker():
+    global total_chips
+    if currentHand == "Two Pair":
+        total_chips += 80
+def deviousjoker():
+    global total_chips
+    if currentHand == "Straight":
+        total_chips += 100
+def craftyjoker():
+    global total_chips
+    if currentHand == "Flush":
+        total_chips += 80
+def halfjoker():
+    global total_mult
+    if len(play_hand) <= 3:
+        total_mult += 20
+def jokerstencil():
+    #TODO add negatives and ask for how many joker spaces are available
+    global total_mult
+    total_mult *= (5 - len(jokers_in_play)) + 1
+            
 
 # Run the program
 if __name__ == "__main__":
